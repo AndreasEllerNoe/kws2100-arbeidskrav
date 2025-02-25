@@ -2,7 +2,7 @@
 ---
 Deltakere: Andreas B, Trym N
 ---
-Innleveringsfrist: 05.05.25
+Innleveringsfrist: 05.03.25
 ---
 Oppgaver:
  
