@@ -9,17 +9,42 @@ import "ol/ol.css";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import { GeoJSON } from "ol/format";
+import { Style, Fill, Stroke, Circle } from "ol/style";
 
 // By calling the "useGeographic" function in OpenLayers, we tell that we want coordinates to be in degrees
 //  instead of meters, which is the default. Without this `center: [10.6, 59.9]` brings us to "null island"
 useGeographic();
 
+const distrikterStyle = new Style({
+  fill: new Fill({
+    color: "rgba(0, 0, 0, 0 )",
+  }),
+  stroke: new Stroke({
+    color: "red",
+    width: 1,
+  }),
+});
+
+const punkterStyle = new Style({
+  image: new Circle({
+    radius: 4,
+    fill: new Fill({
+      color: "black",
+    }),
+    stroke: new Stroke({
+      color: "white",
+      width: 1,
+    }),
+  }),
+});
 // oppretter ny vectorLayer for distrikter kan brukes til fremtidige vectorLayers
+
 const distrikt = new VectorLayer({
   source: new VectorSource({
     url: "/kws2100-kartbaserte-websystemer/geojson/distrikter.json",
     format: new GeoJSON(),
   }),
+  style: distrikterStyle,
 });
 
 const tilfluktsrom = new VectorLayer({
@@ -27,7 +52,10 @@ const tilfluktsrom = new VectorLayer({
     url: "/kws2100-kartbaserte-websystemer/geojson/tilfluktsrom.json",
     format: new GeoJSON(),
   }),
+  style: punkterStyle,
 });
+
+useEffect(() => {}, []);
 
 // Here we create a Map object. Make sure you `import { Map } from "ol"`. Otherwise, the standard Javascript
 //  map data structure will be used
