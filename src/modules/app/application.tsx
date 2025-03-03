@@ -15,6 +15,7 @@ import { Style, Fill, Stroke, Circle } from "ol/style";
 //  instead of meters, which is the default. Without this `center: [10.6, 59.9]` brings us to "null island"
 useGeographic();
 
+// stilen for de for distrikt, tilfluktsrom og hover effekt
 const distrikterStyle = new Style({
   fill: new Fill({
     color: "rgba(0, 0, 0, 0 )",
@@ -37,6 +38,17 @@ const punkterStyle = new Style({
     }),
   }),
 });
+
+const onHover = new Style({
+  fill: new Fill({
+    color: "rgba(255,0,0,0.4)",
+  }),
+  stroke: new Stroke({
+    width: 5,
+    color: "red",
+  }),
+});
+
 // oppretter ny vectorLayer for distrikter kan brukes til fremtidige vectorLayers
 
 const distrikt = new VectorLayer({
@@ -54,8 +66,6 @@ const tilfluktsrom = new VectorLayer({
   }),
   style: punkterStyle,
 });
-
-useEffect(() => {}, []);
 
 // Here we create a Map object. Make sure you `import { Map } from "ol"`. Otherwise, the standard Javascript
 //  map data structure will be used
@@ -75,8 +85,28 @@ export function Application() {
   // map React component
   useEffect(() => {
     map.setTarget(mapRef.current!);
+
+    // dette er hover effekten
+    let lastFeature: any = null;
+
+    map.on("pointermove", (event) => {
+      const feature = map.forEachFeatureAtPixel(
+        event.pixel,
+        (feature) => feature,
+      );
+
+      if (feature !== lastFeature) {
+        if (lastFeature) {
+          lastFeature.setStyle(null);
+        }
+        if (feature) {
+          // @ts-ignore
+          feature.setStyle(onHover);
+        }
+        lastFeature = feature;
+      }
+    });
   }, []);
 
-  // This is the location (in React) where we want the map to be displayed
-  return <div ref={mapRef}></div>;
+  return <div ref={mapRef} style={{ width: "100%", height: "100vh" }}></div>;
 }
