@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Map, View } from "ol";
 import TileLayer from "ol/layer/Tile";
 import { OSM } from "ol/source";
@@ -6,66 +6,18 @@ import { useGeographic } from "ol/proj";
 
 // Styling of OpenLayers components like zoom and pan controls
 import "ol/ol.css";
-import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
+import VectorLayer from "ol/layer/Vector";
 import { GeoJSON } from "ol/format";
-import { Style, Fill, Stroke, Circle } from "ol/style";
+import { TilfluktsromLayerCheckbox } from "../tilfluktsromLayer";
+import { DistrikerLayerCheckbox } from "../sivilforsvarLayer";
+import { Layer } from "ol/layer";
 
 // By calling the "useGeographic" function in OpenLayers, we tell that we want coordinates to be in degrees
 //  instead of meters, which is the default. Without this `center: [10.6, 59.9]` brings us to "null island"
 useGeographic();
 
-// stilen for de for distrikt, tilfluktsrom og hover effekt
-const distrikterStyle = new Style({
-  fill: new Fill({
-    color: "rgba(0, 0, 0, 0 )",
-  }),
-  stroke: new Stroke({
-    color: "red",
-    width: 1,
-  }),
-});
-
-const punkterStyle = new Style({
-  image: new Circle({
-    radius: 4,
-    fill: new Fill({
-      color: "black",
-    }),
-    stroke: new Stroke({
-      color: "white",
-      width: 1,
-    }),
-  }),
-});
-
-const onHover = new Style({
-  fill: new Fill({
-    color: "rgba(255,0,0,0.4)",
-  }),
-  stroke: new Stroke({
-    width: 5,
-    color: "red",
-  }),
-});
-
 // oppretter ny vectorLayer for distrikter kan brukes til fremtidige vectorLayers
-
-const distrikt = new VectorLayer({
-  source: new VectorSource({
-    url: "/kws2100-kartbaserte-websystemer/geojson/distrikter.json",
-    format: new GeoJSON(),
-  }),
-  style: distrikterStyle,
-});
-
-const tilfluktsrom = new VectorLayer({
-  source: new VectorSource({
-    url: "/kws2100-kartbaserte-websystemer/geojson/tilfluktsrom.json",
-    format: new GeoJSON(),
-  }),
-  style: punkterStyle,
-});
 
 // Here we create a Map object. Make sure you `import { Map } from "ol"`. Otherwise, the standard Javascript
 //  map data structure will be used
@@ -73,11 +25,11 @@ const map = new Map({
   // The map will be centered on a position in longitude (x-coordinate, east) and latitude (y-coordinate, north),
   //   with a certain zoom level
   view: new View({ center: [10.8, 59.9], zoom: 13 }),
-  // map tile images will be from the Open Street Map (OSM) tile layer
-  layers: [new TileLayer({ source: new OSM() }), distrikt, tilfluktsrom],
 });
 
 // A functional React component
+const osmLayer = new TileLayer({ source: new OSM() });
+
 export function Application() {
   // `useRef` bridges the gap between JavaScript functions that expect DOM objects and React components
   const mapRef = useRef<HTMLDivElement | null>(null);
@@ -85,28 +37,19 @@ export function Application() {
   // map React component
   useEffect(() => {
     map.setTarget(mapRef.current!);
-
-    // dette er hover effekten
-    let lastFeature: any = null;
-
-    map.on("pointermove", (event) => {
-      const feature = map.forEachFeatureAtPixel(
-        event.pixel,
-        (feature) => feature,
-      );
-
-      if (feature !== lastFeature) {
-        if (lastFeature) {
-          lastFeature.setStyle(null);
-        }
-        if (feature) {
-          // @ts-ignore
-          feature.setStyle(onHover);
-        }
-        lastFeature = feature;
-      }
-    });
   }, []);
+  const [layers, setLayers] = useState<Layer[]>([]);
 
-  return <div ref={mapRef} style={{ width: "100%", height: "100vh" }}></div>;
+  useEffect(() => {
+    map.setLayers([osmLayer, ...layers]);
+  }, [layers]);
+
+  // This is the location (in React) where we want the map to be displayed
+  return (
+    <>
+      <TilfluktsromLayerCheckbox setLayers={setLayers} map={map} />
+      <DistrikerLayerCheckbox setLayers={setLayers} map={map} />
+      <div ref={mapRef}></div>
+    </>
+  );
 }
