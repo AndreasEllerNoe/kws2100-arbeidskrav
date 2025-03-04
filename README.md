@@ -1,1 +1,1 @@
-Dere kan skrive review på det vi har hær :D
+Dere kan skrive review på det vi har hær.
