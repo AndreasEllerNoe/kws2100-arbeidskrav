@@ -1,3 +1,7 @@
+---
+Her er linken til siden: https://andreasellernoe.github.io/kws2100-arbeidskrav/
+---
+
 Kode review
 
 Dere har tatt i bruk alt vi har lært i forelesningene om integrering av React med OpenLayers og OpenLayers-funksjonalitet, og brukt dette på en god måte. All funksjonalitet oppgaven spør etter er med og fungerer bra! Koden er også godt strukturert og ryddig - bruk av prettier og husky som brukt i forelesning som er bra!
