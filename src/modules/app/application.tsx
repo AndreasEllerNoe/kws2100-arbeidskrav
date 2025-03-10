@@ -6,9 +6,6 @@ import { useGeographic } from "ol/proj";
 
 // Styling of OpenLayers components like zoom and pan controls
 import "ol/ol.css";
-import VectorSource from "ol/source/Vector";
-import VectorLayer from "ol/layer/Vector";
-import { GeoJSON } from "ol/format";
 import { TilfluktsromLayerCheckbox } from "../tilfluktsromLayer";
 import { DistrikerLayerCheckbox } from "../sivilforsvarLayer";
 import { Layer } from "ol/layer";

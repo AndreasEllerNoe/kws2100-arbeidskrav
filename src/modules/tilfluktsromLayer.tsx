@@ -3,11 +3,18 @@ import VectorSource from "ol/source/Vector";
 import { GeoJSON } from "ol/format";
 import { Layer } from "ol/layer";
 import React, { useEffect, useRef, useState } from "react";
-import { Map, MapBrowserEvent, Overlay } from "ol";
+import { Feature, Map, MapBrowserEvent, Overlay } from "ol";
 import { FeatureLike } from "ol/Feature";
 import { Fill, Stroke, Style, Circle } from "ol/style";
 
-const source = new VectorSource({
+interface Properties {
+  adresse: string;
+  plasser: number;
+}
+
+type TypedFeature<T> = { getProperties(): T } & Feature;
+
+const source = new VectorSource<TypedFeature<Properties>>({
   url: "/kws2100-kartbaserte-websystemer/geojson/tilfluktsrom.json",
   format: new GeoJSON(),
 });
@@ -29,6 +36,49 @@ const tilfluktsromLayer = new VectorLayer({ source, style: punkterStyle });
 const overlay = new Overlay({
   positioning: "bottom-center",
 });
+
+function TilfluktsromOverlay({ features }: { features: Properties[] }) {
+  let className = "overlay";
+  if (features.length === 1) {
+    const plasser = features[0].plasser;
+    if (plasser < 200) {
+      className += " red";
+    } else if (plasser < 500) {
+      className += " orange";
+    } else {
+      className += " green";
+    }
+  }
+  if (features.length >= 2) {
+    return (
+      <div className={className}>
+        <h3>{features.length} tilfluktsrom</h3>
+        <ul>
+          {features.slice(0, 5).map(({ adresse, plasser }) => (
+            <li key={adresse}>
+              <strong>Adresse:</strong> {adresse} <br />
+              <strong>Plasser:</strong> {plasser} <br />
+            </li>
+          ))}
+          {features.length > 5 && <li>...</li>}
+        </ul>
+      </div>
+    );
+  } else if (features.length === 1) {
+    return (
+      <div className={className}>
+        <h3>Tilfluktsrom</h3>
+        <p>
+          <strong>Adresse:</strong> {features[0].adresse}
+        </p>
+        <p>
+          <strong>Plasser:</strong> {features[0].plasser}
+        </p>
+      </div>
+    );
+  }
+  return <div className={className}></div>;
+}
 
 export function TilfluktsromLayerCheckbox({
   setLayers,
