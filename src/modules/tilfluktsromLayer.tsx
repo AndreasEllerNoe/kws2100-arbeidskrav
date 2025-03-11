@@ -106,7 +106,11 @@ export function TilfluktsromLayerCheckbox({
   }, [checked]);
   return (
     <button onClick={() => setChecked((b) => !b)}>
-      <input type={"checkbox"} checked={checked} />
+      <input
+        type={"checkbox"}
+        checked={checked}
+        onChange={(e) => setChecked(e.target.checked)}
+      />
       Show tilfluktsrom on map
       <div ref={overlayRef}>
         Tilfuktsrom trykket:{" "}

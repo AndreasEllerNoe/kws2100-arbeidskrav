@@ -3,8 +3,6 @@ import { Map, View } from "ol";
 import TileLayer from "ol/layer/Tile";
 import { OSM } from "ol/source";
 import { useGeographic } from "ol/proj";
-
-// Styling of OpenLayers components like zoom and pan controls
 import "ol/ol.css";
 import { TilfluktsromLayerCheckbox } from "../tilfluktsromLayer";
 import { DistrikerLayerCheckbox } from "../sivilforsvarLayer";

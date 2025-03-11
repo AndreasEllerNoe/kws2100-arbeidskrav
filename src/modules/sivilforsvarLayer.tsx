@@ -81,6 +81,8 @@ export function DistrikerLayerCheckbox({
     if (checked) {
       setLayers((old) => [...old, distrikterLayer]);
       map.on("click", handleClick);
+    } else {
+      setLayers((old) => old.filter((l) => l !== distrikterLayer));
     }
     const pointer = (e: MapBrowserEvent<MouseEvent>) => {
       source.forEachFeature((feature) => {
@@ -96,8 +98,12 @@ export function DistrikerLayerCheckbox({
     map.on("pointermove", pointer);
   }, [checked]);
   return (
-    <button onClick={() => setChecked((b) => !b)}>
-      <input type={"checkbox"} checked={checked} />
+    <button>
+      <input
+        type={"checkbox"}
+        checked={checked}
+        onChange={(e) => setChecked(e.target.checked)}
+      />
       Show distrikter on map
       <div ref={overlayRef}>Clicked tilfuktsrom: </div>
     </button>
