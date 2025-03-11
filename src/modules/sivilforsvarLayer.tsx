@@ -16,7 +16,7 @@ interface Properties {
 type TypedFeature<T> = { getProperties(): T } & Feature;
 
 const source = new VectorSource<TypedFeature<Properties>>({
-  url: "/kws2100-kartbaserte-websystemer/geojson/distrikter.json",
+  url: "/kws2100-arbeidskrav/geojson/distrikter.json",
   format: new GeoJSON(),
 });
 
