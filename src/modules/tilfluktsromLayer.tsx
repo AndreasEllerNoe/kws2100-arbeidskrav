@@ -19,6 +19,7 @@ const source = new VectorSource<TypedFeature<Properties>>({
   format: new GeoJSON(),
 });
 
+/**
 const punkterStyle = new Style({
   image: new Circle({
     radius: 4,
@@ -31,54 +32,37 @@ const punkterStyle = new Style({
     }),
   }),
 });
+**/
+const punkterStyle = (feature: TypedFeature<Properties>) => {
+  const plasser = feature.getProperties().plasser;
 
+  let color;
+
+  if (plasser > 500) {
+    color = "red";
+  } else if (plasser > 250) {
+    color = "orange";
+  } else if (plasser > 1) {
+    color = "green";
+  }
+
+  return new Style({
+    image: new Circle({
+      radius: 6,
+      fill: new Fill({ color }),
+      stroke: new Stroke({
+        color: "white",
+        width: 2,
+      }),
+    }),
+  });
+};
+
+// @ts-ignore
 const tilfluktsromLayer = new VectorLayer({ source, style: punkterStyle });
 const overlay = new Overlay({
   positioning: "bottom-center",
 });
-
-function TilfluktsromOverlay({ features }: { features: Properties[] }) {
-  let className = "overlay";
-  if (features.length === 1) {
-    const plasser = features[0].plasser;
-    if (plasser < 200) {
-      className += " red";
-    } else if (plasser < 500) {
-      className += " orange";
-    } else {
-      className += " green";
-    }
-  }
-  if (features.length >= 2) {
-    return (
-      <div className={className}>
-        <h3>{features.length} tilfluktsrom</h3>
-        <ul>
-          {features.slice(0, 5).map(({ adresse, plasser }) => (
-            <li key={adresse}>
-              <strong>Adresse:</strong> {adresse} <br />
-              <strong>Plasser:</strong> {plasser} <br />
-            </li>
-          ))}
-          {features.length > 5 && <li>...</li>}
-        </ul>
-      </div>
-    );
-  } else if (features.length === 1) {
-    return (
-      <div className={className}>
-        <h3>Tilfluktsrom</h3>
-        <p>
-          <strong>Adresse:</strong> {features[0].adresse}
-        </p>
-        <p>
-          <strong>Plasser:</strong> {features[0].plasser}
-        </p>
-      </div>
-    );
-  }
-  return <div className={className}></div>;
-}
 
 export function TilfluktsromLayerCheckbox({
   setLayers,
@@ -94,8 +78,17 @@ export function TilfluktsromLayerCheckbox({
   >([]);
 
   function handleClick(e: MapBrowserEvent<MouseEvent>) {
-    setSelectedtilfluktsrom(map.getFeaturesAtPixel(e.pixel));
+    const features = map.getFeaturesAtPixel(e.pixel);
     overlay.setPosition(e.coordinate);
+    setSelectedtilfluktsrom(features);
+
+    /**   fikk ikke denne til å fungere
+    if (features.length > 0) {
+      overlay.setPosition(e.coordinate); // Vis overlay
+    } else {
+      overlay.setPosition(undefined); // Skjul overlay
+    }
+**/
   }
 
   useEffect(() => {
@@ -116,8 +109,11 @@ export function TilfluktsromLayerCheckbox({
       <input type={"checkbox"} checked={checked} />
       Show tilfluktsrom on map
       <div ref={overlayRef}>
-        Clicked tilfuktsrom:{" "}
+        Tilfuktsrom trykket:{" "}
         {selectedtilfluktsrom.map((s) => s.getProperties().adresse).join(", ")}
+        <br />
+        Plasser:{" "}
+        {selectedtilfluktsrom.map((s) => s.getProperties().plasser).join(", ")}
       </div>
     </button>
   );
